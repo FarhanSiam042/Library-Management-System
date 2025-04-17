@@ -1,0 +1,138 @@
+CREATE DATABASE IF NOT EXISTS LibSys;
+USE LibSys;
+-- Create PERSON table
+CREATE TABLE IF NOT EXISTS PERSON (
+    ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    PNAME VARCHAR(30) NOT NULL,
+    PASSWORD VARCHAR(50) NOT NULL,  -- Increased the size for password to accommodate long strings
+    ADDRESS VARCHAR(100) NOT NULL,   -- Increased the size for address
+    PHONE_NO BIGINT NOT NULL  -- Changed to BIGINT to accommodate longer phone numbers
+);
+
+-- Create BOOK table
+CREATE TABLE IF NOT EXISTS BOOK (
+    ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    TITLE VARCHAR(100) NOT NULL,
+    AUTHOR VARCHAR(100) NOT NULL,
+    SUBJECT VARCHAR(50) NOT NULL,
+    IS_ISSUED BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+-- Create STAFF table
+CREATE TABLE IF NOT EXISTS STAFF (
+    S_ID INT NOT NULL PRIMARY KEY,
+    TYPE VARCHAR(10) NOT NULL,
+    SALARY DOUBLE,
+    FOREIGN KEY (S_ID) REFERENCES PERSON(ID) ON DELETE CASCADE
+);
+
+-- Create CLERK table
+CREATE TABLE IF NOT EXISTS CLERK (
+    C_ID INT NOT NULL PRIMARY KEY,
+    DESK_NO INT NOT NULL,
+    FOREIGN KEY (C_ID) REFERENCES STAFF(S_ID) ON DELETE CASCADE
+);
+
+-- Create LIBRARIAN table
+CREATE TABLE IF NOT EXISTS LIBRARIAN (
+    L_ID INT NOT NULL PRIMARY KEY,
+    OFFICE_NO INT NOT NULL,
+    FOREIGN KEY (L_ID) REFERENCES STAFF(S_ID) ON DELETE CASCADE
+);
+
+-- Create BORROWER table
+CREATE TABLE IF NOT EXISTS BORROWER (
+    B_ID INT NOT NULL PRIMARY KEY,
+    FOREIGN KEY (B_ID) REFERENCES PERSON(ID) ON DELETE CASCADE
+);
+
+-- Create BORROWED_BOOK table
+CREATE TABLE IF NOT EXISTS BORROWED_BOOK (
+    BOOK INT NOT NULL PRIMARY KEY,
+    BORROWER INT NOT NULL,
+    FOREIGN KEY (BOOK) REFERENCES BOOK(ID) ON DELETE CASCADE,
+    FOREIGN KEY (BORROWER) REFERENCES BORROWER(B_ID) ON DELETE CASCADE
+);
+
+-- Create LOAN table
+CREATE TABLE IF NOT EXISTS LOAN (
+    L_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    BORROWER INT NOT NULL,
+    BOOK INT NOT NULL,
+    ISSUER INT NOT NULL,
+    ISS_DATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    RECEIVER INT,
+    RET_DATE TIMESTAMP NULL,
+    FINE_PAID BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (BORROWER) REFERENCES BORROWER(B_ID),
+    FOREIGN KEY (BOOK) REFERENCES BOOK(ID),
+    FOREIGN KEY (ISSUER) REFERENCES STAFF(S_ID),
+    FOREIGN KEY (RECEIVER) REFERENCES STAFF(S_ID)
+);
+
+-- Create ON_HOLD_BOOK table
+CREATE TABLE IF NOT EXISTS ON_HOLD_BOOK (
+    REQ_ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    BOOK INT NOT NULL,
+    BORROWER INT NOT NULL,
+    REQ_DATE DATE NOT NULL,
+    FOREIGN KEY (BOOK) REFERENCES BOOK(ID) ON DELETE CASCADE,
+    FOREIGN KEY (BORROWER) REFERENCES BORROWER(B_ID) ON DELETE CASCADE
+);
+
+-- Insert data into PERSON table
+INSERT INTO PERSON (PNAME, PASSWORD, ADDRESS, PHONE_NO) VALUES
+('John Doe', 'password123', '123 Main St', 1234567890),
+('Jane Smith', 'password123', '456 Elm St', 2345678901),
+('Michael Brown', 'password123', '789 Oak St', 3456789012);
+
+INSERT INTO STAFF (S_ID, TYPE, SALARY) VALUES
+(1, 'Librarian', 50000),
+(2, 'Clerk', 30000),
+(3, 'Clerk', 30000);
+
+-- Insert data into CLERK table
+INSERT INTO CLERK (C_ID, DESK_NO) VALUES
+(2, 101),
+(3, 102);
+
+-- Insert data into LIBRARIAN table
+INSERT INTO LIBRARIAN (L_ID, OFFICE_NO) VALUES
+(1, 301);
+
+-- Insert data into BORROWER table
+INSERT INTO BORROWER (B_ID) VALUES
+(1),
+(2);
+
+-- Insert data into BOOK table
+INSERT INTO BOOK (TITLE, AUTHOR, SUBJECT, IS_ISSUED) VALUES
+('Introduction to Java', 'James Gosling', 'Programming', FALSE),
+('Database Management Systems', 'Ramez Elmasri', 'Computer Science', FALSE),
+('Design Patterns', 'Erich Gamma', 'Software Engineering', FALSE)
+('The Great Gatsby', 'F. Scott Fitzgerald', 'Fiction', FALSE),
+('1984', 'George Orwell', 'Dystopian', FALSE),
+('To Kill a Mockingbird', 'Harper Lee', 'Fiction', FALSE),
+('The Catcher in the Rye', 'J.D. Salinger', 'Fiction', FALSE),
+('Pride and Prejudice', 'Jane Austen', 'Romance', FALSE),
+('The Hobbit', 'J.R.R. Tolkien', 'Fantasy', FALSE),
+('Moby Dick', 'Herman Melville', 'Adventure', FALSE),
+('War and Peace', 'Leo Tolstoy', 'Historical Fiction', FALSE),
+('Crime and Punishment', 'Fyodor Dostoevsky', 'Psychological Fiction', FALSE),
+('The Odyssey', 'Homer', 'Epic Poetry', FALSE),
+('Frankenstein', 'Mary Shelley', 'Gothic Fiction', FALSE),
+('Dracula', 'Bram Stoker', 'Horror', FALSE),
+('The Great Gatsby', 'F. Scott Fitzgerald', 'Classic', FALSE),
+('The Divine Comedy', 'Dante Alighieri', 'Epic Poetry', FALSE),
+('The Brothers Karamazov', 'Fyodor Dostoevsky', 'Philosophical Fiction', FALSE),
+('Jane Eyre', 'Charlotte Brontë', 'Romance', FALSE),
+('Wuthering Heights', 'Emily Brontë', 'Romance', FALSE);
+
+
+-- Insert data into BORROWED_BOOK table
+INSERT INTO BORROWED_BOOK (BOOK, BORROWER) VALUES
+(1, 1),
+(2, 2);
+
+
+
